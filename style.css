@@ -1,0 +1,25 @@
+/* Apply a responsive design to the image container */
+#image-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  /* Style the images */
+  #image-container img {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+    margin: 10px;
+  }
+  
+  /* Style the container on smaller screens */
+  @media (max-width: 600px) {
+    #image-container {
+      flex-direction: column;
+    }
+  
+    #image-container img {
+      width: 100%;
+    }
+  }
+  
