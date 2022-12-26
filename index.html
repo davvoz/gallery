@@ -92,13 +92,7 @@
     // ...
     // Initialize the Firebase app
     const firebaseConfig = {
-      apiKey: "AIzaSyB8m3IyfgaH7_S3f0z_8j7Nf-ryoL5H3_g",
-      authDomain: "wada-42dd4.firebaseapp.com",
-      databaseURL: "https://wada-42dd4.firebaseio.com",
-      projectId: "wada-42dd4",
-      storageBucket: "wada-42dd4.appspot.com",
-      messagingSenderId: "87083060977",
-      appId: "1:87083060977:web:a525a46e147b0f0e7a2350"
+      
     };
     firebase.initializeApp(firebaseConfig);
     // Initialize the Firestore database
@@ -180,7 +174,7 @@
           console.log(error);
         }).then(() => {
           console.log('Image updated successfully');
-        }); 
+        });
       }
       // Delete an image from the Firestore database
       async deleteImage(imageId) {
@@ -293,7 +287,7 @@
             displayImages();
             //chiude il form
             document.getElementById('image-form').style.display = 'none';
-            document. getElementById('loader').style.display = 'none';
+            document.getElementById('loader').style.display = 'none';
           });
         }
       );
@@ -336,20 +330,7 @@
     }
     //END FUNCTIONS
 
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyB8m3IyfgaH7_S3f0z_8j7Nf-ryoL5H3_g",
-      authDomain: "wada-42dd4.firebaseapp.com",
-      databaseURL: "https://wada-42dd4.firebaseio.com",
-      projectId: "wada-42dd4",
-      storageBucket: "wada-42dd4.appspot.com",
-      messagingSenderId: "87083060977",
-      appId: "1:87083060977:web:a525a46e147b0f0e7a2350"
-    };
-    // Initialize the Firebase app
-    firebase.initializeApp(firebaseConfig);
-    // Initialize the Firestore database
-    const db = firebase.firestore();
+
     //handler modal
     document.getElementById('modal-image').addEventListener('click', () => {
       document.getElementById('modal').style.display = 'none';
