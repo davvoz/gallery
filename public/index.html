@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>My Image Gallery</title>
+</head>
+<style>
+  #image-container img {
+    width: 100%;
+    height: auto;
+  }
+
+  .modal-img-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-img-container img {
+    width: 574px;
+    height: auto;
+  }
+
+  .modal-text-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-text-container h4 {
+    margin: 0;
+  }
+
+  .modal-text-container p {
+    margin: 0;
+  }
+</style>
+
+<body>
+
+
+  <div id="all-container">
+    <div id="loader"
+      style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999;">
+      <div
+        style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 2rem;">
+        Loading...</div>
+    </div>
+    <!-- my modal -->
+    <div class="modal fade" id="modal" role="dialog">
+      <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Modal Header</h4>
+          </div>
+          <div class="modal-body">
+            <p>Some text in the modal.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end my modal   -->
+
+    <div id="image-container"
+      style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); grid-gap: 10px;"></div>
+
+    <div id="form-container">
+      <form id="image-form">
+        <input type="file" id="image-file" accept="image/*" required>
+        <input type="text" id="image-title" placeholder="Immagine titolo" required>
+        <input type="text" id="image-description" placeholder="Immagine descrizione" required>
+        <button type="submit">Carica Immagine</button>
+        <img id="image-preview" src="" alt="Anteprima immagine" width="200" style="display: none;">
+      </form>
+    </div>
+
+  </div>
+
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <!-- The Firebase JavaScript SDK must be included in order to use the Storage and Firestore APIs -->
+  <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-storage.js"></script>
+
+  <script>
+    // Initialize the Firebase app and the Firestore database
+    // ...
+    // Initialize the Firebase app
+    const firebaseConfig = {
+      apiKey: "AIzaSyB8m3IyfgaH7_S3f0z_8j7Nf-ryoL5H3_g",
+      authDomain: "wada-42dd4.firebaseapp.com",
+      databaseURL: "https://wada-42dd4.firebaseio.com",
+      projectId: "wada-42dd4",
+      storageBucket: "wada-42dd4.appspot.com",
+      messagingSenderId: "87083060977",
+      appId: "1:87083060977:web:a525a46e147b0f0e7a2350"
+    };
+    firebase.initializeApp(firebaseConfig);
+    // Initialize the Firestore database
+    const db = firebase.firestore();
+
+    // Image class to represent an image object
+    class MyImage {
+      constructor(url, titolo, descrizione) {
+        this.url = url;
+        this.titolo = titolo;
+        this.descrizione = descrizione;
+      }
+    }
+    // ImageList class to manage the list of images
+    class ImageList {
+      constructor() {
+        this.images = [];
+      }
+
+      // Add an image to the list
+      addImage(image) {
+        this.images.push(image);
+      }
+
+      // Get the list of images
+      getImages() {
+        return this.images;
+      }
+    }
+    // ImageService class to handle the communication with the Firestore database
+    class ImageService {
+      // Get the list of images from the Firestore database
+      async getImageList() {
+        // Create a new image list
+        const imageList = new ImageList();
+
+        // Get the images collection from the Firestore database
+        const imagesCollection = db.collection('images');
+
+        // Get the list of images from the collection
+        const images = await imagesCollection.get();
+
+        // Add each image to the list
+        images.forEach(image => {
+          const url = image.data().url;
+          const titolo = image.data().titolo;
+          const descrizione = image.data().descrizione;
+          imageList.addImage(new MyImage(url, titolo, descrizione));
+        });
+
+        return imageList;
+      }
+      // Add an image to the Firestore database
+      async addImage(image) {
+        // Add the image to the images collection
+        const imageRef = db.collection('images').doc();
+        await imageRef.set({
+          url: image.url,
+          titolo: image.titolo,
+          descrizione: image.descrizione
+        });
+
+        // Return the image ID
+        return imageRef.id;
+      }
+
+      // Update an image in the Firestore database
+      async updateImage(imageId, image) {
+        // Get the image from the images collection
+        const imageRef = db.collection('images').doc(imageId);
+
+        // Update the image in the collection
+        await imageRef.update({
+          url: image.url,
+          titolo: image.titolo,
+          descrizione: image.descrizione
+        });
+      }
+
+      // Delete an image from the Firestore database
+      async deleteImage(imageId) {
+        // Get the image from the images collection
+        const imageRef = db.collection('images').doc(imageId);
+
+        // Delete the image from the collection
+        await imageRef.delete();
+      }
+    }
+
+    class ImageServiceController {
+      // Constructor to initialize the ImageService instance
+      constructor() {
+        this.imageService = new ImageService();
+      }
+
+      // Function to get the list of images from the Firestore database
+      async getImageList() {
+        return this.imageService.getImageList();
+      }
+
+      // Function to add an image to the Firestore database
+      async addImage(image) {
+        return this.imageService.addImage(image);
+      }
+
+      // Function to update an image in the Firestore database
+      async updateImage(imageId, image) {
+        return this.imageService.updateImage(imageId, image);
+      }
+
+      // Function to delete an image from the Firestore database
+      async deleteImage(imageId) {
+        return this.imageService.deleteImage(imageId);
+      }
+    }
+
+    function createImageForm() {
+      // Create a form element
+      const form = document.createElement('form');
+      form.setAttribute('id', 'image-form');
+      form.setAttribute('method', 'post');
+      form.setAttribute('enctype', 'multipart/form-data');
+
+      // Create a file input element for selecting the image
+      const fileInput = document.createElement('input');
+      fileInput.setAttribute('type', 'file');
+      fileInput.setAttribute('name', 'image');
+      fileInput.setAttribute('id', 'image-input');
+
+      // Create a label for the file input element
+      const fileInputLabel = document.createElement('label');
+      fileInputLabel.setAttribute('for', 'image-input');
+      fileInputLabel.textContent = 'Select an image';
+
+      // Create a text input element for the image title
+      const titleInput = document.createElement('input');
+      titleInput.setAttribute('type', 'text');
+      titleInput.setAttribute('name', 'title');
+      titleInput.setAttribute('id', 'title-input');
+      titleInput.setAttribute('placeholder', 'Image title');
+
+      // Create a text input element for the image description
+      const descriptionInput = document.createElement('input');
+      descriptionInput.setAttribute('type', 'text');
+      descriptionInput.setAttribute('name', 'description');
+      descriptionInput.setAttribute('id', 'description-input');
+      descriptionInput.setAttribute('placeholder', 'Image description');
+
+      // Create a submit button for the form
+      const submitButton = document.createElement('button');
+      submitButton.setAttribute('type', 'submit');
+      submitButton.textContent = 'Add image';
+
+      // Append the elements to the form
+      form.appendChild(fileInput);
+      form.appendChild(fileInputLabel);
+      form.appendChild(titleInput);
+      form.appendChild(descriptionInput);
+      form.appendChild(submitButton);
+
+      // Return the form element
+      return form;
+    }
+
+    // Function to create an HTML element for an image
+    function createImageElement(image) {
+      console.log(image);
+      // Create the image element
+      const imgElement = document.createElement('img');
+      imgElement.src = image.url;
+      imgElement.alt = image.titolo;
+      imgElement.title = image.titolo;
+
+      // Create the image title element
+      const titleElement = document.createElement('h3');
+      titleElement.innerText = image.titolo;
+
+      // Create the image description element
+      const descElement = document.createElement('p');
+      descElement.innerText = image.descrizione;
+
+      // Create the image container element
+      const imgContainer = document.createElement('div');
+      imgContainer.classList.add('image-container');
+
+      //quando clicco l'immagine mi apre il modal
+      imgElement.addEventListener('click', () => {
+        const modal = document.getElementById('modal');
+        modal.style.display = 'block';
+        modal.innerHTML = '';
+        const modalImg = document.createElement('img');
+        modalImg.src = image.url;
+        modalImg.alt = image.titolo;
+        modalImg.title = image.titolo;
+
+        //scrivi il titolo e la descrizione a fianco dell'immagine
+        const modalTitle = document.createElement('h3');
+        modalTitle.innerText = '';//image.titolo;
+        const modalDesc = document.createElement('p');
+        modalDesc.innerText = '';// image.descrizione;
+        //crea un div per contenere l'immagine, il titolo e la descrizione
+        const modalContainer = document.createElement('div');
+        //crea un div per l'immagine e un div per il titolo e la descrizione
+        const modalImgContainer = document.createElement('div');
+        const modalTextContainer = document.createElement('div');
+        //aggiungi i div al modal
+        modalContainer.appendChild(modalImgContainer);
+        //i due div sono uno a fianco dell'altro
+        modalContainer.classList.add('modal-container');
+        modalImgContainer.classList.add('modal-img-container');
+        modalTextContainer.classList.add('modal-text-container');
+        modalImgContainer.appendChild(modalImg);
+        modalTextContainer.appendChild(modalTitle);
+        modalTextContainer.appendChild(modalDesc);
+        modalContainer.appendChild(modalTextContainer);
+        modal.appendChild(modalContainer);
+        //quando clicco fuori dall'immagine il modal si chiude
+        modal.addEventListener('click', () => {
+          modal.style.display = 'none';
+        });
+
+      });
+      // Append the image, title and description to the image container
+      imgContainer.appendChild(imgElement);
+      // imgContainer.appendChild(titleElement);
+      // imgContainer.appendChild(descElement);
+
+      return imgContainer;
+    }
+
+    // Function to display the list of images in the gallery
+    async function displayImages() {
+      // Create an instance of the ImageServiceController class
+      const imageServiceController = new ImageServiceController();
+
+      // Get the list of images from the Firestore database
+      const imageList = await imageServiceController.getImageList();
+
+      // Clear the image container
+      document.getElementById('image-container').innerHTML = '';
+
+      // Add an HTML element for each image to the image container
+      imageList.getImages().forEach(image => {
+        const imgElement = createImageElement(image);
+        document.getElementById('image-container').appendChild(imgElement);
+      });
+    }
+    document.getElementById('modal').addEventListener('click', () => {
+      const modal = document.getElementById('modal');
+      modal.style.display = 'none';
+    });
+    document.getElementById('modal').style.display = 'none';
+
+    // Display the list of images
+    displayImages();
+
+    // Get the reference to the storage bucket
+    const storage = firebase.storage();
+    const storageRef = storage.ref();
+
+    // List all the items in the storage bucket
+    storageRef.listAll().then((result) => {
+      result.items.forEach((itemRef) => {
+        console.log(itemRef.fullPath);
+      });
+    }).catch((error) => {
+      //console.error(error);
+    });
+
+    // Create a form element
+    const form = document.getElementById('image-form');
+    //quando scelgo il file si vede una anteprima
+    document.getElementById('image-file').addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        document.getElementById('image-preview').style.display = 'block';
+        document.getElementById('image-preview').src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Add the form to the page
+    //document.getElementById('form-container').appendChild(form);
+
+    // Add an event listener to the form to handle the submit event
+    form.addEventListener('submit', (event) => {
+      // Prevent the form from submitting
+      event.preventDefault();
+
+      // Get the file and the image title and description from the form
+      const file = document.getElementById('image-file').files[0];
+      const title = document.getElementById('image-title').value;
+      const description = document.getElementById('image-description').value;
+
+      // Check if a file was selected
+      if (file) {
+        // Upload the file to Firebase Storage and add it to the Firestore database
+        uploadImage(file, title, description);
+      }
+    });
+
+    // Function to upload an image to Firebase Storage and add it to the Firestore database
+    function uploadImage(file, title, description) {
+
+      const loader = document.getElementById('loader');
+      loader.style.display = 'block';
+
+      // Get the file name
+      const fileName = file.name;
+
+      // Create a storage reference
+      const storageRef = firebase.storage().ref('images/' + fileName);
+
+      // Upload the file
+      const task = storageRef.put(file);
+
+      // Update the upload progress
+      task.on('state_changed',
+        (snapshot) => {
+          // Get the upload progress
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log('Upload is ' + progress + '% done');
+        },
+        (error) => {
+          // Handle errors
+          console.error(error);
+        },
+        () => {
+          // Upload completed successfully, now we can get the download URL
+          task.snapshot.ref.getDownloadURL().then((downloadURL) => {
+            console.log('File available at', downloadURL);
+
+            // Create an instance of the ImageServiceController class
+            const imageServiceController = new ImageServiceController();
+
+            // Add the image to the Firestore database
+            imageServiceController.addImage(new MyImage(downloadURL, title, description));
+
+            // Display the list of images
+            displayImages();
+            loader.style.display = 'none';
+          });
+        }
+      );
+    }
+
+  </script>
+</body>
+
+</html>
