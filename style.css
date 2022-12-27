@@ -1,207 +1,213 @@
-
+/* il body deve essere lrgo quanto il display */
+body {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: #f1f1f1;
+}
 /* Apply a responsive design to the image container */
 #image-container {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  #modal-edit-form {
-    display: none;
-    position: fixed;
-    margin: 0px auto;
-    inset: 0px;
-    z-index: 99999;
-  }
-  /* Style the images */
-  #image-container img {
-    width: 300px;
-    height: 300px;
-    object-fit: cover;
-    margin: 10px;
-  }
-  
-  /* Style the container on smaller screens */
-  @media (max-width: 600px) {
-    #image-container {
-      flex-direction: column;
-    }
-  
-    #image-container img {
-      width: 100%;
-    }
-  }
-
-  #image-container img {
-    width: 100%;
-    height: auto;
-  }
-
-  .modal-img-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .modal-img-container img {
-    width: 574px;
-    height: auto;
-  }
-
-  .modal-text-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .modal-text-container h4 {
-    margin: 0;
-  }
-
-  .modal-text-container p {
-    margin: 0;
-  }
-
-  .modal-dialog {
-    max-width: 1000px;
-    position: fixed;
-  }
-
-  button {
-    padding: 10px;
-    border: none;
-    background-color: #4CAF50;
-    color: white;
-    cursor: pointer;
-  }
-
-  /*fai gli input stilosissimi*/
-  input[type=text],
-  input[type=file] {
-    width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
-
-  #edit-form{
-    border-radius: 5px;
-    background-color: rgba(0, 0, 0, 0.5);
-    padding: 20px;
-    width: 50%;
-    margin: 0 auto;
-    position: absolute;
-    /*fai gli image-form centrati nella pagina */
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-  
-  }
-
-  #image-form {
-    border-radius: 5px;
-    background-color: black;
-    padding: 20px;
-    width: 50%;
-    margin: 0 auto;
-    position: absolute;
-    /*fai gli image-form centrati nella pagina */
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
-
-  #image-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    grid-gap: 10px;
-
-  }
-
-  #loader {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 9999;
-    display: none;
-  }
-
-  #modal-fade {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 9999;
-  }
-
-  .edit-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin: 5px;
-    float: right;
-  }
-
-  .modal-fade {
-    /*tutto schermo elementi centrati*/
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    z-index: 9999;
-
-  }
-
-  .modal-dialog {
-    /*tutto schermo elementi centrati*/
-    max-width: 1000px;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    margin: auto;
-  }
-.modal-fade{
-  font-family: 'Roboto', sans-serif;color: white;
+  display: flex;
+  flex-wrap: wrap;
 }
-  #image-form {
-    display: block;
-    position: absolute;
-    margin: 0px auto;
-    inset: 0px;
-    z-index: 99999;
-    height: 50%;
-    top: 15%;
-  }
-#toolbar{position: fixed; top: 0; left: 0; width: 100%; background-color: #4CAF50; padding: 10px; z-index: 9999;}
-  #modal-image {
-    height: 100%;
-    width: auto;
-    top: 15%;
+#modal-edit-form {
+  display: none;
+  position: fixed;
+  margin: 0px auto;
+  inset: 0px;
+  z-index: 99999;
+}
+/* Style the images */
+#image-container img {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  margin: 10px;
+}
+
+/* Style the container on smaller screens */
+@media (max-width: 600px) {
+  #image-container {
+    flex-direction: column;
   }
 
-  #modal {
-    display: none;
-    position: fixed;
-    margin: 0px auto;
-    inset: 0px;
-    z-index: 99999;
+  #image-container img {
+    width: 100%;
   }
-  
+}
+
+#image-container img {
+  width: 100%;
+  height: auto;
+}
+
+.modal-img-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-img-container img {
+  width: 574px;
+  height: auto;
+}
+
+.modal-text-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-text-container h4 {
+  margin: 0;
+}
+
+.modal-text-container p {
+  margin: 0;
+}
+
+.modal-dialog {
+  max-width: 1000px;
+  position: fixed;
+}
+
+button {
+  padding: 10px;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+}
+
+/*fai gli input stilosissimi*/
+input[type=text],
+input[type=file] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+#edit-form{
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  width: 50%;
+  margin: 0 auto;
+  position: absolute;
+  /*fai gli image-form centrati nella pagina */
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+}
+
+#image-form {
+  border-radius: 5px;
+  background-color: black;
+  padding: 20px;
+  width: 50%;
+  margin: 0 auto;
+  position: absolute;
+  /*fai gli image-form centrati nella pagina */
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+#image-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-gap: 10px;
+
+}
+
+#loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: none;
+}
+
+#modal-fade {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+.edit-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 5px;
+  float: right;
+}
+
+.modal-fade {
+  /*tutto schermo elementi centrati*/
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+
+}
+
+.modal-dialog {
+  /*tutto schermo elementi centrati*/
+  max-width: 1000px;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+.modal-fade{
+font-family: 'Roboto', sans-serif;color: white;
+}
+#image-form {
+  display: block;
+  position: absolute;
+  margin: 0px auto;
+  inset: 0px;
+  z-index: 99999;
+  height: 50%;
+  top: 15%;
+}
+#toolbar{position: fixed; top: 0; left: 0; width: 100%; background-color: #4CAF50; padding: 10px; z-index: 9999;}
+#modal-image {
+  height: 100%;
+  width: auto;
+  top: 15%;
+}
+
+#modal {
+  display: none;
+  position: fixed;
+  margin: 0px auto;
+  inset: 0px;
+  z-index: 99999;
+}
