@@ -2,149 +2,371 @@
 <html lang="en">
 
 <head>
-  <title>My Image Gallery</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carousel di Immagini con Lazy Loading</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Raleway:wght@500&display=swap"
+        rel="stylesheet">
+    
+    <style>
+        /* Reset CSS */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Barra di navigazione estrosa */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #2c3e50;
+            /* colore di sfondo più ricco */
+            font-family: 'Raleway', sans-serif;
+            /* font più audace */
+        }
+
+        .navbar a {
+            color: #3498db;
+            /* colore del testo accattivante */
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            color: #e74c3c;
+            /* colore del testo al passaggio del mouse più contrastato */
+        }
+
+        .navbar h1 {
+            color: #f39c12;
+            /* colore del titolo più vivace */
+            font-size: 28px;
+            /* dimensione del titolo aumentata */
+        }
+
+        /* Carousel container */
+        .carousel-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .carousel-container img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            /* bordi più arrotondati */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            /* ombra più pronunciata */
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .carousel-container img:hover {
+            transform: scale(1.1);
+            /* effetto hover ampliato */
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+        }
+
+        /* Titolo */
+        .title {
+            color: #9b59b6;
+            /* colore del titolo più audace */
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 32px;
+            /* dimensione del titolo aumentata */
+        }
+
+        /* Modal */
+        .modal-fade {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .modal-dialog {
+            margin: 30px auto;
+            max-width: 800px;
+        }
+
+        .modal-content {
+            background-color: #34495e;
+            /* colore di sfondo più intenso */
+            border-radius: 15px;
+            /* bordi più arrotondati */
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            /* ombra più marcata */
+        }
+
+        /* Aggiunti stili per i bottoni della modal */
+        .modal-button {
+            background-color: transparent;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-button:hover {
+            color: #27ae60;
+            /* colore del testo al passaggio del mouse più vibrante */
+        }
+
+        /* Posizionamento dei bottoni uno a sinistra e uno a destra */
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            border-bottom: none;
+            background-color: #2980b9;
+            /* colore di sfondo più brillante */
+        }
+
+        /* Rimozione dello stile dei bottoni sui dispositivi mobili */
+        @media (max-width: 768px) {
+            .modal-button {
+                display: none;
+            }
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-img-container {
+            text-align: center;
+        }
+
+        .modal-img-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-text-container {
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            text-align: center;
+            border-top: none;
+            background-color: #2980b9;
+        }
+
+        .modal-h4 {
+            color: #ecf0f1;
+            /* colore del testo più chiaro */
+            font-family: 'Montserrat', sans-serif;
+            /* font più audace */
+            font-size: 28px;
+            /* dimensione del testo aumentata */
+        }
+
+        .modal-desc {
+            color: #bdc3c7;
+            /* colore del testo più morbido */
+        }
+
+        /* Material Icons */
+        .material-icons {
+            font-family: 'Material Icons';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /*su mobile la modale non deve avere i pulsanti next e prev ma deve essere possibile chiuderla e scrollare*/
+        @media (max-width: 768px) {
+            .soloDesktop {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
-  <div id="all-container">
+    <!-- Barra di navigazione -->
+    <div class="navbar">
+
+        <!-- Titolo -->
+        <h1 class="title">My Gallery App</h1>
+    </div>
+    <div id="loader" class="loader"></div>
+
+    <!-- Modal -->
     <div class="modal-fade" id="modal" role="dialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-          </div>
-          <div class="modal-body">
-            <div class="modal-img-container">
-              <img src="" alt="modal image" id="modal-image">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button id="prev-button"
+                        class="modal-button material-icons soloDesktop">keyboard_arrow_left</button>
+                    <h2 id="modal-h4" class="modal-h4">Modal Title</h2>
+                    <button id="next-button"
+                        class="modal-button material-icons soloDesktop">keyboard_arrow_right</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-img-container">
+                        <img src="" alt="modal image" id="modal-image">
+                    </div>
+                    <div class="modal-text-container" id="modal-text-container">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <p id="modal-desc">Modal Description</p>
+                </div>
             </div>
-            <div class="modal-text-container" id="modal-text-container">
-              <h2 id="modal-h4">Modal Title</h2>
-              <p id="modal-desc">Modal Description</p>
-            </div>
-          </div>
-          <div class="modal-footer">
-          </div>
         </div>
-      </div>
     </div>
-    <div id="toolbar">
-      <h1>
-        My Gallery App
-      </h1>
+
+    <!-- Carousel container -->
+    <div class="carousel-container">
+        <!-- Le immagini verranno caricate dinamicamente tramite JavaScript -->
     </div>
-    <div id="image-container" style="margin-top:150px">
-    </div>
-  </div>
-  <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-storage.js"></script>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyB8m3IyfgaH7_S3f0z_8j7Nf-ryoL5H3_g",
-      authDomain: "wada-42dd4.firebaseapp.com",
-      databaseURL: "https://wada-42dd4.firebaseio.com",
-      projectId: "wada-42dd4",
-      storageBucket: "wada-42dd4.appspot.com",
-      messagingSenderId: "87083060977",
-      appId: "1:87083060977:web:a525a46e147b0f0e7a2350"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    document.getElementById('modal').addEventListener('click', () => {
-      document.getElementById('modal').style.display = 'none';
-    });
 
-    
+    <!-- Includi Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-storage.js"></script>
+    <script>
+        const loader = document.getElementById('loader');
+        // Mostra il loader
+        loader.style.display = 'block';
 
-    class MyImage {
-      constructor(url, titolo, descrizione) {
-        this.url = url;
-        this.titolo = titolo;
-        this.descrizione = descrizione;
-      }
-    }
-    class ImageList {
-      constructor() {
-        this.images = [];
-      }
+        // Configurazione di Firebase
 
-      addImage(image) {
-        this.images.push(image);
-      }
 
-      getImages() {
-        return this.images;
-      }
-    }
-    class ImageService {
-      async getImageList() {
-        const imageList = new ImageList();
-        const imagesCollection = db.collection('images');
-        const images = await imagesCollection.get();
-        images.forEach(image => {
-          const url = image.data().url;
-          const titolo = image.data().titolo;
-          const descrizione = image.data().descrizione;
-          imageList.addImage(new MyImage(url, titolo, descrizione));
+        const firebaseConfig = {
+            apiKey: "",
+            authDomain: "",
+            databaseURL: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: ""
+        };
+
+        // Inizializza Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        let index = 0;
+        // Recupera le immagini da Firebase
+        const arrayParallelo = [];
+        async function getImages() {
+            const images = await db.collection('images').get();
+            images.forEach(image => {
+                console.log(image.data());
+                // Crea un elemento immagine
+                const img = new Image();
+                // Imposta l'attributo src con l'URL dell'immagine
+                img.src = image.data().url;
+                img.classList.add('image');
+                img.loading = 'lazy';
+                arrayParallelo.push(image.data());
+                document.querySelector('.carousel-container').appendChild(img);
+
+                // Aggiungi un event listener per mostrare il modal
+                img.addEventListener('click', () => {
+                    showModal(img, image.data().titolo, image.data().descrizione);
+                });
+            });
+
+        }
+
+        getImages().then(() => {
+            loader.style.display = 'none';
         });
-        return imageList;
-      }
-    }
-    class ImageServiceController {
-      constructor() {
-        this.imageService = new ImageService();
-      }
 
-      async getImageList() {
-        return this.imageService.getImageList();
-      }
-    }
-    function createImageElement(image) {
+        // Mostra il modal
+        function showModal(img, titolo, descrizione) {
+            console.log(img, titolo, descrizione);
+            const modal = document.getElementById('modal');
+            const modalImage = document.getElementById('modal-image');
+            const modalH4 = document.getElementById('modal-h4');
+            const modalDesc = document.getElementById('modal-desc');
+            const modalTextContainer = document.getElementById('modal-text-container');
 
-      // Create the image element
-      const imgElement = document.createElement('img');
-      imgElement.src = image.url;
-      imgElement.alt = image.titolo;
-      imgElement.title = image.titolo;
+            modalImage.src = img.src;
+            modalH4.textContent = titolo;
+            modalDesc.textContent = descrizione;
+            modal.style.display = 'block';
+        }
 
-      // Create the image container element
-      const imgContainer = document.createElement('div');
-      imgContainer.classList.add('image-container');
+        // Chiudi il modal
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.style.display = 'none';
+        }
 
-      //quando clicco l'immagine mi apre il modal
-      imgElement.addEventListener('click', () => {
-        //utilizza gli id scritti nell html attenzione che qua image è undefined
-        document.getElementById('modal-image').src = image.url;
-        document.getElementById('modal-desc').innerText = image.descrizione;
-        document.getElementById('modal-h4').innerText = image.titolo;
-        // Show the modal
-        document.getElementById('modal').style.display = 'block';
+        // Aggiungi un event listener per chiudere il modal cliccando sullo sfondo
+        const modal = document.getElementById('modal');
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
 
-      });
-      // Append the image, title and description to the image container
-      imgContainer.appendChild(imgElement);
-      //imgContainer.appendChild(titleElement);
-      return imgContainer;
-    }
-    async function displayImages() {
-      const imageServiceController = new ImageServiceController();
-      const imageList = await imageServiceController.getImageList();
-      document.getElementById('image-container').innerHTML = '';
-      imageList.getImages().forEach(image => {
-        const imgElement = createImageElement(image);
-        document.getElementById('image-container').appendChild(imgElement);
-      });
-    }
-    function sistema() {
-      document.getElementById('modal-edit-form').style.display = 'none';
-      document.getElementById('modal-text-container').style.display = 'block';
+        //next button
+        const nextButton = document.getElementById('next-button');
+        nextButton.addEventListener('click', () => {
+            if (index < arrayParallelo.length - 1) {
+                index++;
+                const img = new Image();
+                img.src = arrayParallelo[index].url;
+                img.loading = 'lazy';
+                showModal(img, arrayParallelo[index].titolo, arrayParallelo[index].descrizione);
+            }
+        });
 
-    }
+        //prev button
+        const prevButton = document.getElementById('prev-button');
+        prevButton.addEventListener('click', () => {
+            if (index > 0) {
+                index--;
+                const img = new Image();
+                img.src = arrayParallelo[index].url;
+                img.loading = 'lazy';
+                showModal(img, arrayParallelo[index].titolo, arrayParallelo[index].descrizione);
+            }
+        });
 
-    displayImages();
 
-  </script>
+
+    </script>
 </body>
 
 </html>
