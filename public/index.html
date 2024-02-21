@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Raleway:wght@500&display=swap"
         rel="stylesheet">
-    
+
     <style>
         /* Reset CSS */
         * {
@@ -267,17 +267,15 @@
         // Mostra il loader
         loader.style.display = 'block';
 
-        // Configurazione di Firebase
-
 
         const firebaseConfig = {
-            apiKey: "",
-            authDomain: "",
-            databaseURL: "",
-            projectId: "",
-            storageBucket: "",
-            messagingSenderId: "",
-            appId: ""
+            apiKey: "AIzaSyB8m3IyfgaH7_S3f0z_8j7Nf-ryoL5H3_g",
+            authDomain: "wada-42dd4.firebaseapp.com",
+            databaseURL: "https://wada-42dd4.firebaseio.com",
+            projectId: "wada-42dd4",
+            storageBucket: "wada-42dd4.appspot.com",
+            messagingSenderId: "87083060977",
+            appId: "1:87083060977:web:a525a46e147b0f0e7a2350"
         };
 
         // Inizializza Firebase
@@ -289,7 +287,6 @@
         async function getImages() {
             const images = await db.collection('images').get();
             images.forEach(image => {
-                console.log(image.data());
                 // Crea un elemento immagine
                 const img = new Image();
                 // Imposta l'attributo src con l'URL dell'immagine
@@ -298,13 +295,11 @@
                 img.loading = 'lazy';
                 arrayParallelo.push(image.data());
                 document.querySelector('.carousel-container').appendChild(img);
-
                 // Aggiungi un event listener per mostrare il modal
                 img.addEventListener('click', () => {
                     showModal(img, image.data().titolo, image.data().descrizione);
                 });
             });
-
         }
 
         getImages().then(() => {
@@ -313,7 +308,6 @@
 
         // Mostra il modal
         function showModal(img, titolo, descrizione) {
-            console.log(img, titolo, descrizione);
             const modal = document.getElementById('modal');
             const modalImage = document.getElementById('modal-image');
             const modalH4 = document.getElementById('modal-h4');
@@ -324,6 +318,9 @@
             modalH4.textContent = titolo;
             modalDesc.textContent = descrizione;
             modal.style.display = 'block';
+
+            //aggiorna l 'indice
+            index = arrayParallelo.findIndex((element) => element.url === img.src);
         }
 
         // Chiudi il modal
@@ -343,6 +340,7 @@
         //next button
         const nextButton = document.getElementById('next-button');
         nextButton.addEventListener('click', () => {
+            //attenzione a riprendere l'indice giusto
             if (index < arrayParallelo.length - 1) {
                 index++;
                 const img = new Image();
@@ -350,11 +348,14 @@
                 img.loading = 'lazy';
                 showModal(img, arrayParallelo[index].titolo, arrayParallelo[index].descrizione);
             }
+
+
         });
 
         //prev button
         const prevButton = document.getElementById('prev-button');
         prevButton.addEventListener('click', () => {
+            //attenzione a riprendere l'indice giusto
             if (index > 0) {
                 index--;
                 const img = new Image();
@@ -363,6 +364,62 @@
                 showModal(img, arrayParallelo[index].titolo, arrayParallelo[index].descrizione);
             }
         });
+
+        //su mobile se si scrolla orizzontalmente si passa alla foto successiva o precedente
+        let xDown = null;
+        let yDown = null;
+
+        function getTouches(evt) {
+            return evt.touches || evt.originalEvent.touches;
+        }
+
+        function handleTouchStart(evt) {
+            const firstTouch = getTouches(evt)[0];
+            xDown = firstTouch.clientX;
+            yDown = firstTouch.clientY;
+        };
+
+        function handleTouchMove(evt) {
+            if (!xDown || !yDown) {
+                return;
+            }
+
+            var xUp = evt.touches[0].clientX;
+            var yUp = evt.touches[0].clientY;
+
+            var xDiff = xDown - xUp;
+            var yDiff = yDown - yUp;
+
+            if (Math.abs(xDiff) > Math.abs(yDiff)) {/*mostro la foto successiva o precedente*/
+                if (xDiff > 0) {
+                    if (index < arrayParallelo.length - 1) {
+                        index++;
+                        const img = new Image();
+                        img.src = arrayParallelo[index].url;
+                        img.loading = 'lazy';
+                        showModal(img, arrayParallelo[index].titolo, arrayParallelo[index].descrizione);
+                    }
+                } else {
+                    if (index > 0) {
+                        index--;
+                        const img = new Image();
+                        img.src = arrayParallelo[index].url;
+                        img.loading = 'lazy';
+                        showModal(img, arrayParallelo[index].titolo, arrayParallelo[index].descrizione);
+                    }
+                }
+            }
+            /* reset values */
+
+            xDown = null;
+            yDown = null;
+        };
+
+        document.getElementById('modal').addEventListener('touchstart', handleTouchStart, { passive: true });
+        document.getElementById('modal').addEventListener('touchmove', handleTouchMove, { passive: true });
+        //(index):412 [Violation] Added non-passive event listener to a scroll-blocking 'touchmove' event. Consider marking event handler as 'passive' to make the page more responsive. See https://www.chromestatus.com/feature/5745543795965952
+        //come detto sopra, come fare per risolvere il problema del touchmove?
+        //la sintassi potrebbe essere questa: document.getElementById('modal').addEventListener('touchmove', handleTouchMove, {passive: true});
 
 
 
