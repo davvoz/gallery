@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carousel di Immagini con Lazy Loading</title>
+    <title>My gallery</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Raleway:wght@500&display=swap"
-        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kdam+Thmor+Pro&display=swap" rel="stylesheet">
 
     <style>
         /* Reset CSS */
@@ -15,6 +16,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: 'Kdam Thmor Pro', serif;
         }
 
         /* Barra di navigazione estrosa */
@@ -25,7 +27,7 @@
             padding: 20px;
             background-color: #2c3e50;
             /* colore di sfondo più ricco */
-            font-family: 'Raleway', sans-serif;
+            font-family: 'Kdam Thmor Pro', serif;
             /* font più audace */
         }
 
@@ -180,7 +182,6 @@
         .modal-h4 {
             color: #ecf0f1;
             /* colore del testo più chiaro */
-            font-family: 'Montserrat', sans-serif;
             /* font più audace */
             font-size: 28px;
             /* dimensione del testo aumentata */
@@ -215,13 +216,33 @@
                 display: none;
             }
         }
+
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .navbar-links {
+            display: flex;
+        }
     </style>
 </head>
 
 <body>
     <!-- Barra di navigazione -->
     <div class="navbar">
-
+        <div class="navbar-links">
+            <a href="#">Home</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+        </div>
         <!-- Titolo -->
         <h1 class="title">My Gallery App</h1>
     </div>
@@ -257,19 +278,22 @@
         <!-- Le immagini verranno caricate dinamicamente tramite JavaScript -->
     </div>
 
+    <!--loader-->
+    <div id="loader" class="loader"></div>
 
     <!-- Includi Firebase -->
     <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-storage.js"></script>
     <script>
+
         const loader = document.getElementById('loader');
         // Mostra il loader
         loader.style.display = 'block';
 
 
         const firebaseConfig = {
-            apiKey: "AIzaSyB8m3IyfgaH7_S3f0z_8j7Nf-ryoL5H3_g",
+            apiKey: "",
             authDomain: "wada-42dd4.firebaseapp.com",
             databaseURL: "https://wada-42dd4.firebaseio.com",
             projectId: "wada-42dd4",
@@ -283,18 +307,27 @@
         const db = firebase.firestore();
         let index = 0;
         // Recupera le immagini da Firebase
+
+
         const arrayParallelo = [];
         async function getImages() {
             const images = await db.collection('images').get();
-            images.forEach(image => {
+            //ordina le immagini per progressivo decrescente
+            const sortedImages = images.docs.sort((a, b) => b.data().progressivo - a.data().progressivo);
+            sortedImages.forEach(image => {
                 // Crea un elemento immagine
                 const img = new Image();
                 // Imposta l'attributo src con l'URL dell'immagine
                 img.src = image.data().url;
                 img.classList.add('image');
                 img.loading = 'lazy';
+
                 arrayParallelo.push(image.data());
+                //non mostrare ancora le immagini
+                img.style.display = 'none';
                 document.querySelector('.carousel-container').appendChild(img);
+
+
                 // Aggiungi un event listener per mostrare il modal
                 img.addEventListener('click', () => {
                     showModal(img, image.data().titolo, image.data().descrizione);
@@ -304,6 +337,10 @@
 
         getImages().then(() => {
             loader.style.display = 'none';
+            //mostra le immagini
+            document.querySelectorAll('.image').forEach((img) => {
+                img.style.display = 'block';
+            });
         });
 
         // Mostra il modal
@@ -321,12 +358,16 @@
 
             //aggiorna l 'indice
             index = arrayParallelo.findIndex((element) => element.url === img.src);
+            //SE + APERTO IL MODALE INIBISCO LO SCROLL DELLA PAGINA
+            document.body.style.overflow = 'hidden';
         }
 
         // Chiudi il modal
         function closeModal() {
             const modal = document.getElementById('modal');
             modal.style.display = 'none';
+            //RIABILITO LO SCROLL DELLA PAGINA
+            document.body.style.overflow = 'auto';
         }
 
         // Aggiungi un event listener per chiudere il modal cliccando sullo sfondo
@@ -337,33 +378,32 @@
             }
         });
 
-        //next button
-        const nextButton = document.getElementById('next-button');
-        nextButton.addEventListener('click', () => {
-            //attenzione a riprendere l'indice giusto
-            if (index < arrayParallelo.length - 1) {
-                index++;
-                const img = new Image();
-                img.src = arrayParallelo[index].url;
-                img.loading = 'lazy';
-                showModal(img, arrayParallelo[index].titolo, arrayParallelo[index].descrizione);
+        function changeImage(indexChange) {
+            index += indexChange;
+            const img = new Image();
+            img.src = arrayParallelo[index].url;
+            img.loading = 'lazy';
+            showModal(img, arrayParallelo[index].titolo, arrayParallelo[index].descrizione);
+        }
+
+        const buttons = {
+            'next-button': 1,
+            'prev-button': -1
+        };
+
+        for (const buttonId in buttons) {
+            const button = document.getElementById(buttonId);
+            button.addEventListener('click', () => handleClick(buttons[buttonId]));
+        }
+
+        function handleClick(direction) {
+            const newIndex = index + direction;
+            if (newIndex >= 0 && newIndex < arrayParallelo.length) {
+                changeImage(direction);
             }
+        }
 
 
-        });
-
-        //prev button
-        const prevButton = document.getElementById('prev-button');
-        prevButton.addEventListener('click', () => {
-            //attenzione a riprendere l'indice giusto
-            if (index > 0) {
-                index--;
-                const img = new Image();
-                img.src = arrayParallelo[index].url;
-                img.loading = 'lazy';
-                showModal(img, arrayParallelo[index].titolo, arrayParallelo[index].descrizione);
-            }
-        });
 
         //su mobile se si scrolla orizzontalmente si passa alla foto successiva o precedente
         let xDown = null;
@@ -390,24 +430,20 @@
             var xDiff = xDown - xUp;
             var yDiff = yDown - yUp;
 
-            if (Math.abs(xDiff) > Math.abs(yDiff)) {/*mostro la foto successiva o precedente*/
-                if (xDiff > 0) {
-                    if (index < arrayParallelo.length - 1) {
-                        index++;
-                        const img = new Image();
-                        img.src = arrayParallelo[index].url;
-                        img.loading = 'lazy';
-                        showModal(img, arrayParallelo[index].titolo, arrayParallelo[index].descrizione);
-                    }
-                } else {
-                    if (index > 0) {
-                        index--;
-                        const img = new Image();
-                        img.src = arrayParallelo[index].url;
-                        img.loading = 'lazy';
-                        showModal(img, arrayParallelo[index].titolo, arrayParallelo[index].descrizione);
-                    }
-                }
+            const directionMap = new Map([
+                [true, 1],  // true indica andare alla foto successiva
+                [false, -1] // false indica andare alla foto precedente
+            ]);
+
+            const direction = xDiff > 0; // true se xDiff è positivo (andare avanti), altrimenti false (andare indietro)
+            const newIndex = index + directionMap.get(direction);
+
+            if (newIndex >= 0 && newIndex < arrayParallelo.length) {
+                index = newIndex;
+                const img = new Image();
+                img.src = arrayParallelo[index].url;
+                img.loading = 'lazy';
+                showModal(img, arrayParallelo[index].titolo, arrayParallelo[index].descrizione);
             }
             /* reset values */
 
@@ -417,10 +453,6 @@
 
         document.getElementById('modal').addEventListener('touchstart', handleTouchStart, { passive: true });
         document.getElementById('modal').addEventListener('touchmove', handleTouchMove, { passive: true });
-        //(index):412 [Violation] Added non-passive event listener to a scroll-blocking 'touchmove' event. Consider marking event handler as 'passive' to make the page more responsive. See https://www.chromestatus.com/feature/5745543795965952
-        //come detto sopra, come fare per risolvere il problema del touchmove?
-        //la sintassi potrebbe essere questa: document.getElementById('modal').addEventListener('touchmove', handleTouchMove, {passive: true});
-
 
 
     </script>
