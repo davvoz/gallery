@@ -135,15 +135,7 @@
     let selectedImage = null;
     let indexUltimaImmagine = 0;
     //crea un oggetto fatto per le categorie in 
-    const firebaseConfig = {
-      apiKey: "",
-      authDomain: "wada-42dd4.firebaseapp.com",
-      databaseURL: "https://wada-42dd4.firebaseio.com",
-      projectId: "wada-42dd4",
-      storageBucket: "wada-42dd4.appspot.com",
-      messagingSenderId: "87083060977",
-      appId: "1:87083060977:web:a525a46e147b0f0e7a2350"
-    };
+ 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     // Image class to represent an image object
