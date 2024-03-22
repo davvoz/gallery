@@ -54,7 +54,7 @@
         /* Carousel container */
         .carousel-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 20px;
             padding: 20px;
         }
@@ -229,8 +229,92 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
-        .navbar-links {
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .contatti {
+            /*tutto sotto il carousel*/
             display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: #2c3e50;
+            /* colore di sfondo più ricco */
+            font-family: 'Kdam Thmor Pro', serif;
+            /* font più audace */
+
+
+        }
+
+        .contatti a {
+            color: #3498db;
+            /* colore del testo accattivante */
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+
+        .contatti a:hover {
+            color: #e74c3c;
+            /* colore del testo al passaggio del mouse più contrastato */
+        }
+
+        .contatti h1 {
+            color: #f39c12;
+            /* colore del titolo più vivace */
+            font-size: 28px;
+            /*a sinistra*/
+            margin-right: 20px;
+        }
+
+        #tornaSu {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #tornaSu:hover {
+            background-color: #e74c3c;
+        }
+
+        /*torna su per mobile*/
+        @media (max-width: 768px) {
+            #tornaSu {
+                bottom: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .contatti {
+                display: flex;
+                justify-content: flex-start;
+                align-items: baseline;
+                padding: 20px;
+                background-color: #2c3e50;
+                font-family: 'Kdam Thmor Pro', serif;
+                flex-direction: column;
+                align-content: flex-start;
+            }
         }
     </style>
 </head>
@@ -238,11 +322,17 @@
 <body>
     <!-- Barra di navigazione -->
     <div class="navbar">
+        <!-- Link devono aprire nuove schede ,attento perchè sono tanti e su mobile non ci stanno tutti , quindi potresti doverli raggruppare in un menu a tendina -->
+        <div class="navbar-links">
+            <!--ancora a contatti-->
+            <a class="contattiAnchor">Contatti</a>
+        </div>
         <!-- Titolo -->
         <h1 class="title">My Gallery App</h1>
     </div>
+    </div>
+    <!-- Loader -->
     <div id="loader" class="loader"></div>
-
     <!-- Modal -->
     <div class="modal-fade" id="modal" role="dialog">
         <div class="modal-dialog">
@@ -272,15 +362,55 @@
     <div class="carousel-container">
         <!-- Le immagini verranno caricate dinamicamente tramite JavaScript -->
     </div>
-
-    <!--loader-->
-    <div id="loader" class="loader"></div>
-
+    <!-- Contatti -->
+    <div id="contatti" class="contatti">
+        <h1>Contatti</h1>
+    </div>
+    <button class="material-icons" id="tornaSu">arrow_upward</button>
     <!-- Includi Firebase -->
     <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-storage.js"></script>
     <script>
+        //quando vai giu con contatti , va giù smooth
+        document.querySelector('.contattiAnchor').addEventListener('click', () => {
+            document.getElementById('contatti').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Torna su
+        const tornaSu = document.getElementById('tornaSu');
+        window.onscroll = function () {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                tornaSu.style.display = 'block';
+            } else {
+                tornaSu.style.display = 'none';
+            }
+        };
+
+        tornaSu.addEventListener('click', () => {
+            //scrolla fino all'inizio della pagina
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        const contatti = [
+            { name: 'OPENSEA', link: 'https://opensea.io/Luciogiolli' },
+            { name: 'UPV', link: 'https://upvu.org/@luciojolly' },
+            { name: 'X', link: 'https://twitter.com/GiolliLucio' },
+            { name: 'Instagram', link: 'https://www.instagram.com/luciogiolli/' },
+            { name: 'GitHub', link: 'https://github.com/davvoz' },
+            { name: 'Youtube', link: 'https://www.youtube.com/channel/UC07hr6Av0l2vgrXrJmrCXEA' }];
+
+        const contattiContainer = document.querySelector('.contatti');
+        contatti.forEach((contatto) => {
+            const a = document.createElement('a');
+            a.href = contatto.link;
+            a.textContent = contatto.name;
+            //apri in un'altra scheda
+            a.target = '_blank';
+            contattiContainer.appendChild(a);
+        });
+
+
 
         const loader = document.getElementById('loader');
         // Mostra il loader
