@@ -9,6 +9,7 @@
 
 <body>
   <div id="all-container">
+
     <!-- loader -->
     <div id="loader">
       <div>
@@ -72,6 +73,13 @@
       <h1>
         PANNELLO DI AMMINISTRAZIONE - My Gallery App
       </h1>
+      <button id="enable-animation" style="z-index: 1000;top: 0;right: 0;"
+        onclick="document.getElementById('animationContainer').style.display = 'block';document.getElementById('disable-animation').style.display = 'block';document.getElementById('image-container').style.display = 'none';">Enable
+        Animation</button>
+      <button id="disable-animation" style="display: none;z-index: 1000;top: 0;right: 0;"
+        onclick="document.getElementById('animationContainer').style.display = 'none';document.getElementById('disable-animation').style.display = 'none';document.getElementById('image-container').style.display = 'block';">Disable
+        Animation</button>
+
       <button id="add-image-button" onclick="document.getElementById('image-form').style.display = 'block';">Aggiungi
         Immagine</button>
       <button id="scorri-indietro" onclick="scorriAvanti(-10)" style="background-color: orange;">Scorri
@@ -97,6 +105,9 @@
     <!-- The image cards will be inserted here -->
     <div id="image-container" style="margin-top:150px">
       <!-- The image cards will be inserted here -->
+    </div>
+    <div id="animationContainer">
+      <canvas id="canvas"></canvas>
     </div>
     <!-- end image container -->
     <!-- The image form -->
@@ -128,6 +139,8 @@
   </div>
   <!-- The core Firebase JS SDK is always required and must be listed first -->
   <!-- The Firebase JavaScript SDK must be included in order to use the Storage and Firestore APIs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
+
   <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-storage.js"></script>
@@ -135,16 +148,16 @@
     let selectedImage = null;
     let indexUltimaImmagine = 0;
     //crea un oggetto fatto per le categorie in 
- 
+
     const firebaseConfig = {
-            apiKey: "",
-            authDomain: "wada-42dd4.firebaseapp.com",
-            databaseURL: "https://wada-42dd4.firebaseio.com",
-            projectId: "wada-42dd4",
-            storageBucket: "wada-42dd4.appspot.com",
-            messagingSenderId: "87083060977",
-            appId: "1:87083060977:web:a525a46e147b0f0e7a2350"
-        };
+      apiKey: "",
+      authDomain: "wada-42dd4.firebaseapp.com",
+      databaseURL: "https://wada-42dd4.firebaseio.com",
+      projectId: "wada-42dd4",
+      storageBucket: "wada-42dd4.appspot.com",
+      messagingSenderId: "87083060977",
+      appId: "1:87083060977:web:a525a46e147b0f0e7a2350"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
@@ -483,7 +496,7 @@
       const storageRef = firebase.storage().ref();
       //devo cercare sullo storge , ma non ho il nome del file 
       // Create a reference to the file to delete
-      
+
 
       displayImages();
       document.getElementById('modal').style.display = 'none';
@@ -644,6 +657,166 @@
         });
       });
     }
+    // Shader sources
+    const vertexShaderSource = `
+      attribute vec4 aVertexPosition;
+      attribute vec2 aTextureCoord;
+
+      uniform mat4 uModelViewMatrix;
+      uniform mat4 uProjectionMatrix;
+
+      varying highp vec2 vTextureCoord;
+
+      void main(void) {
+        gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+        vTextureCoord = aTextureCoord;
+      }
+    `;
+
+    const fragmentShaderSource = `
+      varying highp vec2 vTextureCoord;
+
+      uniform sampler2D uSampler;
+
+      void main(void) {
+        gl_FragColor = texture2D(uSampler, vTextureCoord);
+      }
+    `;
+
+    // Initialize WebGL
+    const canvas = document.getElementById('canvas');
+    canvas.width = document.body.clientWidth;
+    canvas.height = document.body.clientHeight;
+    canvas.style.backgroundColor = 'aliceblue';
+    const gl = canvas.getContext('webgl');
+
+    if (!gl) {
+      alert('Unable to initialize WebGL. Your browser may not support it.');
+    }
+
+    // Compile shader
+    function compileShader(gl, shaderSource, shaderType) {
+      const shader = gl.createShader(shaderType);
+      gl.shaderSource(shader, shaderSource);
+      gl.compileShader(shader);
+
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error('Shader compilation error:', gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+      }
+
+      return shader;
+    }
+
+    const vertexShader = compileShader(gl, vertexShaderSource, gl.VERTEX_SHADER);
+    const fragmentShader = compileShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
+
+    // Create shader program
+    const shaderProgram = gl.createProgram();
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+      console.error('Shader program linking error:', gl.getProgramInfoLog(shaderProgram));
+    }
+
+    gl.useProgram(shaderProgram);
+
+    // Define geometry
+    const vertices = [];
+    const textureCoords = [];
+
+    const latitudeBands = 30;
+    const longitudeBands = 30;
+    const radius = 1;
+
+    for (let lat = 0; lat <= latitudeBands; lat++) {
+      const theta = lat * Math.PI / latitudeBands;
+      const sinTheta = Math.sin(theta);
+      const cosTheta = Math.cos(theta);
+
+      for (let lon = 0; lon <= longitudeBands; lon++) {
+        const phi = lon * 2 * Math.PI / longitudeBands;
+        const sinPhi = Math.sin(phi);
+        const cosPhi = Math.cos(phi);
+
+        const x = cosPhi * sinTheta;
+        const y = cosTheta;
+        const z = sinPhi * sinTheta;
+        const u = 1 - (lon / longitudeBands);
+        const v = 1 - (lat / latitudeBands);
+
+        textureCoords.push(u, v);
+        vertices.push(radius * x, radius * y, radius * z);
+      }
+    }
+
+    const vertexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+    const textureCoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
+
+    // Set up attributes
+    const vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vertexPositionAttribute);
+
+    const textureCoordAttribute = gl.getAttribLocation(shaderProgram, 'aTextureCoord');
+    gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
+    gl.vertexAttribPointer(textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(textureCoordAttribute);
+
+    // Load texture
+    const texture = gl.createTexture();
+    const image = new Image();
+    image.onload = function () {
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+      gl.generateMipmap(gl.TEXTURE_2D);
+    };
+    //https://imgur.com/a/imtOG4L
+    image.src = 'https://i.imgur.com/uegMHbb.jpg';
+
+    // Set up uniforms
+    const uModelViewMatrix = gl.getUniformLocation(shaderProgram, 'uModelViewMatrix');
+    const uProjectionMatrix = gl.getUniformLocation(shaderProgram, 'uProjectionMatrix');
+    const uSampler = gl.getUniformLocation(shaderProgram, 'uSampler');
+
+    // Set up projection matrix
+    const projectionMatrix = mat4.create();
+    mat4.perspective(projectionMatrix, 45 * Math.PI / 180, canvas.width / canvas.height, 0.1, 100.0);
+    gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
+
+    // Set up model view matrix
+    const modelViewMatrix = mat4.create();
+    mat4.translate(modelViewMatrix, modelViewMatrix, [0, 0, -5]);
+    gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix);
+
+    // Set up texture
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.uniform1i(uSampler, 0);
+
+    // Draw the geometry
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length / 3);
+
+    //crea il loop per l'animazione
+    function animate() {
+      requestAnimationFrame(animate);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertices.length / 3);
+    }
+
+    animate();
 
   </script>
 </body>

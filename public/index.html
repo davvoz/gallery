@@ -410,8 +410,6 @@
             contattiContainer.appendChild(a);
         });
 
-
-
         const loader = document.getElementById('loader');
         // Mostra il loader
         loader.style.display = 'block';
@@ -528,8 +526,6 @@
             }
         }
 
-
-
         //su mobile se si scrolla orizzontalmente si passa alla foto successiva o precedente
         let xDown = null;
         let yDown = null;
@@ -546,6 +542,12 @@
 
         function handleTouchMove(evt) {
             if (!xDown || !yDown) {
+                return;
+            }
+
+            // Verifica il numero di tocchi
+            if (getTouches(evt).length > 1) {
+                // Se ci sono più di un tocco, lo zoom è in corso, quindi esce dalla funzione
                 return;
             }
 
@@ -571,10 +573,10 @@
                 showModal(img, arrayParallelo[index].titolo, arrayParallelo[index].descrizione);
             }
             /* reset values */
-
             xDown = null;
             yDown = null;
         };
+
 
         document.getElementById('modal').addEventListener('touchstart', handleTouchStart, { passive: true });
         document.getElementById('modal').addEventListener('touchmove', handleTouchMove, { passive: true });
