@@ -526,28 +526,33 @@
             }
         }
 
-        //su mobile se si scrolla orizzontalmente si passa alla foto successiva o precedente
         let xDown = null;
         let yDown = null;
+        let isZooming = false;
 
         function getTouches(evt) {
             return evt.touches || evt.originalEvent.touches;
         }
 
         function handleTouchStart(evt) {
-            const firstTouch = getTouches(evt)[0];
-            xDown = firstTouch.clientX;
-            yDown = firstTouch.clientY;
+            if (evt.touches.length > 1) {
+                isZooming = true;
+                return;
+            }
+            xDown = evt.touches[0].clientX;
+            yDown = evt.touches[0].clientY;
         };
 
         function handleTouchMove(evt) {
+            if (isZooming) {
+                return;
+            }
+
             if (!xDown || !yDown) {
                 return;
             }
 
-            // Verifica il numero di tocchi
             if (getTouches(evt).length > 1) {
-                // Se ci sono più di un tocco, lo zoom è in corso, quindi esce dalla funzione
                 return;
             }
 
@@ -558,11 +563,11 @@
             var yDiff = yDown - yUp;
 
             const directionMap = new Map([
-                [true, 1],  // true indica andare alla foto successiva
-                [false, -1] // false indica andare alla foto precedente
+                [true, 1],
+                [false, -1]
             ]);
 
-            const direction = xDiff > 0; // true se xDiff è positivo (andare avanti), altrimenti false (andare indietro)
+            const direction = xDiff > 0;
             const newIndex = index + directionMap.get(direction);
 
             if (newIndex >= 0 && newIndex < arrayParallelo.length) {
@@ -572,14 +577,20 @@
                 img.loading = 'lazy';
                 showModal(img, arrayParallelo[index].titolo, arrayParallelo[index].descrizione);
             }
-            /* reset values */
+
             xDown = null;
             yDown = null;
         };
 
+        function handleTouchEnd() {
+            isZooming = false;
+            xDown = null;
+            yDown = null;
+        }
 
         document.getElementById('modal').addEventListener('touchstart', handleTouchStart, { passive: true });
         document.getElementById('modal').addEventListener('touchmove', handleTouchMove, { passive: true });
+        document.getElementById('modal').addEventListener('touchend', handleTouchEnd);
 
 
     </script>
