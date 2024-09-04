@@ -6,8 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Metatag per Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image"><!--immagine quadrata-->
-    <meta name="twitter:card" content="summary"><!--immagine rettangolare-->
-    
     <meta name="twitter:site" content="@luciogiolli">
     <meta name="twitter:creator" content="@luciogiolli">
     <meta name="twitter:title" content="My Gallery App">
@@ -15,6 +13,28 @@
         content="This is a simple gallery app built with Firebase and JavaScript.There are my AI-ART images.">
     <meta name="twitter:image"
         content="https://firebasestorage.googleapis.com/v0/b/wada-42dd4.appspot.com/o/images%2FUntitled%20image%20(2).png?alt=media&token=75f81462-24de-4c0f-b104-167101714cd0">
+
+    <!--metatag per whatsapp-->
+    <meta property="og:title" content="My Gallery App">
+    <meta property="og:description"
+        content="This is a simple gallery app built with Firebase and JavaScript.There are my AI-ART images.">
+    <meta property="og:image"
+        content="https://firebasestorage.googleapis.com/v0/b/wada-42dd4.appspot.com/o/images%2FUntitled%20image%20(2).png?alt=media&token=75f81462-24de-4c0f-b104-167101714cd0">
+    <meta property="og:url" content="https://wada-42dd4.web.app/">
+    <meta property="og:site_name" content="My Gallery App">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="My Gallery App">
+    <meta property="og:see_also" content="https://wada-42dd4.web.app/">
+    <meta name="description"
+        content="This is a simple gallery app built with Firebase and JavaScript.There are my AI-ART images.">
+    <meta name="keywords" content="gallery,firebase,javascript,art,ai,images">
+    <meta name="author" content="Lucio Giolli">
+    <meta name="robots" content="index, follow">
+
     <title>My gallery</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,87 +42,109 @@
     <link href="https://fonts.googleapis.com/css2?family=Kdam+Thmor+Pro&display=swap" rel="stylesheet">
 
     <style>
-        /* Reset CSS */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Kdam Thmor Pro', serif;
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
         }
 
-        /* Barra di navigazione estrosa */
+        body {
+            background-color: #1a1a2e;
+            color: #ecf0f1;
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 20px;
-            background-color: #2c3e50;
-            /* colore di sfondo più ricco */
-            font-family: 'Kdam Thmor Pro', serif;
-            /* font più audace */
+            background: linear-gradient(135deg, #2c3e50, #4a69bd);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border-radius: 0 0 15px 15px;
+            transition: background 0.3s ease;
         }
 
         .navbar a {
-            color: #3498db;
-            /* colore del testo accattivante */
+            color: #ecf0f1;
             text-decoration: none;
-            margin: 0 10px;
-            transition: color 0.3s ease;
+            margin: 0 15px;
+            font-weight: 400;
+            transition: color 0.3s ease, transform 0.3s ease;
         }
 
         .navbar a:hover {
-            color: #e74c3c;
-            /* colore del testo al passaggio del mouse più contrastato */
+            color: #f39c12;
+            transform: scale(1.1);
         }
 
         .navbar h1 {
             color: #f39c12;
-            /* colore del titolo più vivace */
-            font-size: 28px;
-            /* dimensione del titolo aumentata */
+            font-size: 30px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        /* Carousel container */
         .carousel-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-            padding: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            padding: 60px;
         }
 
         .carousel-container img {
             width: 100%;
-            height: 200px;
+            height: 300px;
             object-fit: cover;
-            border-radius: 10px;
-            /* bordi più arrotondati */
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-            /* ombra più pronunciata */
-            transition: transform 0.3s ease;
+            border-radius: 20px;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+            transition: transform 0.4s ease, box-shadow 0.4s ease, filter 0.4s ease;
             cursor: pointer;
+            filter: brightness(90%);
         }
 
         .carousel-container img:hover {
             transform: scale(1.1);
-            /* effetto hover ampliato */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            filter: brightness(100%);
         }
 
-        /* Loader */
         .loader {
-            display: none;
+            border: 6px solid rgba(243, 243, 243, 0.5);
+            border-top: 6px solid #f39c12;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
-        /* Titolo */
+        @keyframes spin {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
         .title {
-            color: #9b59b6;
-            /* colore del titolo più audace */
+            color: #f39c12;
             text-align: center;
-            margin-bottom: 20px;
-            font-size: 32px;
-            /* dimensione del titolo aumentata */
+            margin: 60px 0;
+            font-size: 40px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
-        /* Modal */
         .modal-fade {
             display: none;
             position: fixed;
@@ -112,219 +154,184 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0, 0, 0, 0.9);
+            background-color: rgba(0, 0, 0, 0.95);
+            transition: opacity 0.5s ease;
         }
 
         .modal-dialog {
-            margin: 30px auto;
-            max-width: 800px;
+            margin: 50px auto;
+            max-width: 850px;
+            border-radius: 20px;
+            overflow: hidden;
         }
 
         .modal-content {
-            background-color: #34495e;
-            /* colore di sfondo più intenso */
-            border-radius: 15px;
-            /* bordi più arrotondati */
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
-            /* ombra più marcata */
+            background: linear-gradient(135deg, #ffffff, #f0f4f8);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.7);
+            overflow: hidden;
         }
 
-        /* Aggiunti stili per i bottoni della modal */
         .modal-button {
             background-color: transparent;
             border: none;
-            color: #fff;
-            font-size: 24px;
+            color: #f39c12;
+            font-size: 26px;
             cursor: pointer;
-            transition: color 0.3s ease;
+            padding: 12px;
+            transition: color 0.3s ease, transform 0.3s ease;
         }
 
         .modal-button:hover {
-            color: #27ae60;
-            /* colore del testo al passaggio del mouse più vibrante */
+            color: #e74c3c;
+            transform: rotate(90deg);
         }
 
-        /* Posizionamento dei bottoni uno a sinistra e uno a destra */
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px;
-            text-align: center;
-            border-bottom: none;
-            background-color: #2980b9;
-            /* colore di sfondo più brillante */
-        }
-
-        /* Rimozione dello stile dei bottoni sui dispositivi mobili */
-        @media (max-width: 768px) {
-            .modal-button {
-                display: none;
-            }
+            padding: 25px;
+            background-color: #2c3e50;
+            border-bottom: 1px solid #f39c12;
         }
 
         .modal-body {
-            padding: 20px;
+            padding: 30px;
         }
 
         .modal-img-container {
             text-align: center;
+            max-height: 75vh;
+            overflow: hidden;
         }
 
         .modal-img-container img {
             max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            max-height: 75vh;
+            object-fit: contain;
+            border-radius: 15px;
+            transition: transform 0.4s ease;
+        }
+
+        .modal-img-container img:hover {
+            transform: scale(1.05);
         }
 
         .modal-text-container {
-            width: 100%;
-            padding: 0 20px;
+            padding: 25px;
+            font-size: 18px;
+            color: #333;
         }
 
         .modal-footer {
-            padding: 20px;
+            padding: 25px;
             text-align: center;
-            border-top: none;
-            background-color: #2980b9;
+            background-color: #ecf0f1;
+            border-top: 1px solid #f39c12;
+            color:  #f39c12;
         }
 
         .modal-h4 {
-            color: #ecf0f1;
-            /* colore del testo più chiaro */
-            /* font più audace */
-            font-size: 28px;
-            /* dimensione del testo aumentata */
+            color: #f39c12;
+            font-size: 26px;
+            font-weight: 700;
         }
 
         .modal-desc {
-            color: #bdc3c7;
-            /* colore del testo più morbido */
-        }
-
-        /* Material Icons */
-        .material-icons {
-            font-family: 'Material Icons';
-            font-weight: normal;
-            font-style: normal;
-            font-size: 24px;
-            line-height: 1;
-            letter-spacing: normal;
-            text-transform: none;
-            display: inline-block;
-            word-wrap: normal;
-            white-space: nowrap;
-            direction: ltr;
-            -webkit-font-feature-settings: 'liga';
-            font-feature-settings: 'liga';
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /*su mobile la modale non deve avere i pulsanti next e prev ma deve essere possibile chiuderla e scrollare*/
-        @media (max-width: 768px) {
-            .soloDesktop {
-                display: none;
-            }
-        }
-
-        .loader {
-            border: 16px solid #f3f3f3;
-            border-top: 16px solid #3498db;
-            border-radius: 50%;
-            width: 120px;
-            height: 120px;
-            animation: spin 2s linear infinite;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
+            color: #7f8c8d;
+            font-size: 18px;
+            line-height: 1.8;
         }
 
         .contatti {
-            /*tutto sotto il carousel*/
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 50px;
             background-color: #2c3e50;
-            /* colore di sfondo più ricco */
-            font-family: 'Kdam Thmor Pro', serif;
-            /* font più audace */
-
-
+            flex-wrap: wrap;
         }
 
         .contatti a {
-            color: #3498db;
-            /* colore del testo accattivante */
+            color: #ecf0f1;
             text-decoration: none;
-            margin: 0 10px;
-            transition: color 0.3s ease;
+            margin: 15px;
+            padding: 15px 30px;
+            border-radius: 10px;
+            background-color: #4a69bd;
+            transition: background-color 0.4s ease, transform 0.4s ease;
         }
 
         .contatti a:hover {
-            color: #e74c3c;
-            /* colore del testo al passaggio del mouse più contrastato */
+            background-color: #f39c12;
+            transform: translateY(-5px);
         }
 
         .contatti h1 {
             color: #f39c12;
-            /* colore del titolo più vivace */
-            font-size: 28px;
-            /*a sinistra*/
+            font-size: 32px;
             margin-right: 20px;
+            flex-basis: 100%;
+            text-align: center;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         #tornaSu {
             display: none;
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #3498db;
+            bottom: 30px;
+            right: 30px;
+            background-color: #f39c12;
             color: white;
             border: none;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 24px;
+            width: 60px;
+            height: 60px;
+            font-size: 28px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
         #tornaSu:hover {
             background-color: #e74c3c;
+            transform: scale(1.15);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
         }
 
-        /*torna su per mobile*/
         @media (max-width: 768px) {
-            #tornaSu {
-                bottom: 10px;
-                right: 10px;
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
+            .carousel-container {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                padding: 30px;
+            }
+
+            .navbar {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .navbar h1 {
+                margin-bottom: 15px;
             }
 
             .contatti {
-                display: flex;
-                justify-content: flex-start;
-                align-items: baseline;
-                padding: 20px;
-                background-color: #2c3e50;
-                font-family: 'Kdam Thmor Pro', serif;
                 flex-direction: column;
-                align-content: flex-start;
+                align-items: center;
+            }
+
+            .contatti h1 {
+                margin-right: 0;
+                margin-bottom: 25px;
+            }
+
+            #tornaSu {
+                bottom: 15px;
+                right: 15px;
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
             }
         }
     </style>
@@ -383,7 +390,7 @@
     <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-storage.js"></script>
     <script>
-        //quando vai giu con contatti , va giù smooth
+        // Scroll fluido verso la sezione contatti
         document.querySelector('.contattiAnchor').addEventListener('click', () => {
             document.getElementById('contatti').scrollIntoView({ behavior: 'smooth' });
         });
@@ -399,33 +406,33 @@
         };
 
         tornaSu.addEventListener('click', () => {
-            //scrolla fino all'inizio della pagina
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
+        // Popola la sezione contatti
         const contatti = [
             { name: 'OPENSEA', link: 'https://opensea.io/Luciogiolli' },
             { name: 'UPV', link: 'https://upvu.org/@luciojolly' },
             { name: 'X', link: 'https://twitter.com/GiolliLucio' },
             { name: 'Instagram', link: 'https://www.instagram.com/luciogiolli/' },
             { name: 'GitHub', link: 'https://github.com/davvoz' },
-            { name: 'Youtube', link: 'https://www.youtube.com/channel/UC07hr6Av0l2vgrXrJmrCXEA' }];
+            { name: 'Youtube', link: 'https://www.youtube.com/channel/UC07hr6Av0l2vgrXrJmrCXEA' }
+        ];
 
         const contattiContainer = document.querySelector('.contatti');
         contatti.forEach((contatto) => {
             const a = document.createElement('a');
             a.href = contatto.link;
             a.textContent = contatto.name;
-            //apri in un'altra scheda
             a.target = '_blank';
             contattiContainer.appendChild(a);
         });
 
-        const loader = document.getElementById('loader');
         // Mostra il loader
+        const loader = document.getElementById('loader');
         loader.style.display = 'block';
 
-
+        // Configurazione Firebase
         const firebaseConfig = {
             apiKey: "",
             authDomain: "wada-42dd4.firebaseapp.com",
@@ -440,29 +447,20 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         let index = 0;
-        // Recupera le immagini da Firebase
-
-
         const arrayParallelo = [];
+
         async function getImages() {
             const images = await db.collection('images').get();
-            //ordina le immagini per progressivo decrescente
             const sortedImages = images.docs.sort((a, b) => b.data().progressivo - a.data().progressivo);
             sortedImages.forEach(image => {
-                // Crea un elemento immagine
                 const img = new Image();
-                // Imposta l'attributo src con l'URL dell'immagine
                 img.src = image.data().url;
                 img.classList.add('image');
                 img.loading = 'lazy';
-
                 arrayParallelo.push(image.data());
-                //non mostrare ancora le immagini
                 img.style.display = 'none';
                 document.querySelector('.carousel-container').appendChild(img);
 
-
-                // Aggiungi un event listener per mostrare il modal
                 img.addEventListener('click', () => {
                     showModal(img, image.data().titolo, image.data().descrizione);
                 });
@@ -471,7 +469,6 @@
 
         getImages().then(() => {
             loader.style.display = 'none';
-            //mostra le immagini
             document.querySelectorAll('.image').forEach((img) => {
                 img.style.display = 'block';
             });
@@ -490,9 +487,7 @@
             modalDesc.textContent = descrizione;
             modal.style.display = 'block';
 
-            //aggiorna l 'indice
             index = arrayParallelo.findIndex((element) => element.url === img.src);
-            //SE + APERTO IL MODALE INIBISCO LO SCROLL DELLA PAGINA
             document.body.style.overflow = 'hidden';
         }
 
@@ -500,13 +495,10 @@
         function closeModal() {
             const modal = document.getElementById('modal');
             modal.style.display = 'none';
-            //RIABILITO LO SCROLL DELLA PAGINA
             document.body.style.overflow = 'auto';
         }
 
-        // Aggiungi un event listener per chiudere il modal cliccando sullo sfondo
-        const modal = document.getElementById('modal');
-        modal.addEventListener('click', (e) => {
+        document.getElementById('modal').addEventListener('click', (e) => {
             if (e.target === modal) {
                 closeModal();
             }
@@ -537,72 +529,76 @@
             }
         }
 
+        // Gestione del tocco per zoom e swipe
+        let initialDistance = 0;
+        let currentScale = 1;
+        let isZooming = false;
         let xDown = null;
         let yDown = null;
-        let isZooming = false;
 
-        function getTouches(evt) {
-            return evt.touches || evt.originalEvent.touches;
+        // Funzione per rilevare lo zoom
+        function isSiteZoomed() {
+            return window.visualViewport.scale > 1;
         }
 
         function handleTouchStart(evt) {
-            if (evt.touches.length > 1) {
+            if (evt.touches.length === 2) {
+                initialDistance = getDistance(evt.touches[0], evt.touches[1]);
                 isZooming = true;
-                return;
+            } else {
+                xDown = evt.touches[0].clientX;
+                yDown = evt.touches[0].clientY;
             }
-            xDown = evt.touches[0].clientX;
-            yDown = evt.touches[0].clientY;
-        };
+        }
 
         function handleTouchMove(evt) {
-            if (isZooming) {
-                return;
+            if (isZooming && evt.touches.length === 2) {
+                const currentDistance = getDistance(evt.touches[0], evt.touches[1]);
+                const scale = currentDistance / initialDistance;
+                currentScale *= scale;
+                currentScale = Math.max(1, Math.min(currentScale, 3));
+                const modalImage = document.getElementById('modal-image');
+                modalImage.style.transform = `scale(${currentScale})`;
+                initialDistance = currentDistance;
+            } else if (!isZooming) {
+                if (!xDown || !yDown || isSiteZoomed()) {
+                    return; // Inibisce lo swipe se il sito è zoomato
+                }
+
+                const xUp = evt.touches[0].clientX;
+                const yUp = evt.touches[0].clientY;
+
+                const xDiff = xDown - xUp;
+                const yDiff = yDown - yUp;
+
+                if (Math.abs(xDiff) > Math.abs(yDiff)) {
+                    if (xDiff > 0) {
+                        handleClick(1);
+                    } else {
+                        handleClick(-1);
+                    }
+                }
+                xDown = null;
+                yDown = null;
             }
+        }
 
-            if (!xDown || !yDown) {
-                return;
-            }
-
-            if (getTouches(evt).length > 1) {
-                return;
-            }
-
-            var xUp = evt.touches[0].clientX;
-            var yUp = evt.touches[0].clientY;
-
-            var xDiff = xDown - xUp;
-            var yDiff = yDown - yUp;
-
-            const directionMap = new Map([
-                [true, 1],
-                [false, -1]
-            ]);
-
-            const direction = xDiff > 0;
-            const newIndex = index + directionMap.get(direction);
-
-            if (newIndex >= 0 && newIndex < arrayParallelo.length) {
-                index = newIndex;
-                const img = new Image();
-                img.src = arrayParallelo[index].url;
-                img.loading = 'lazy';
-                showModal(img, arrayParallelo[index].titolo, arrayParallelo[index].descrizione);
-            }
-
-            xDown = null;
-            yDown = null;
-        };
+        function getDistance(touch1, touch2) {
+            const dx = touch1.clientX - touch2.clientX;
+            const dy = touch1.clientY - touch2.clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
 
         function handleTouchEnd() {
             isZooming = false;
             xDown = null;
             yDown = null;
+            initialDistance = 0;
         }
 
         document.getElementById('modal').addEventListener('touchstart', handleTouchStart, { passive: true });
         document.getElementById('modal').addEventListener('touchmove', handleTouchMove, { passive: true });
         document.getElementById('modal').addEventListener('touchend', handleTouchEnd);
-
 
     </script>
 </body>
